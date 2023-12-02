@@ -1,113 +1,46 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker_web/image_picker_web.dart';
+import 'package:ostrinder/chatscreen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-void main() {
-  Supabase.initialize(
+
+import 'dart:typed_data';
+import 'package:image_picker_web/image_picker_web.dart';
+Future<void> main() async {
+  await Supabase.initialize(
     url: 'https://qnwzkrvbedkphyylkrgb.supabase.co',
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFud3prcnZiZWRrcGh5eWxrcmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0MzYxNjQsImV4cCI6MjAxNzAxMjE2NH0.jtiObMhtY0dRqRLZCFkxs87vPUlF0MAUoBN-dw20A_o',
   );
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Math Questions App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomePage(),
-    );
+  final data = await supabase.from('questions').select('*');
+  runApp( MaterialApp(home: MainApp(),));
+
+  for (var element in data) {
+    ids.add(element['id']);
+    asnwers.add(element['answers']);
+    links.add(element['link']);
   }
+  print(data);
+  print(ids);
+  print(asnwers);
+  print(links);
 }
 
-class HomePage extends StatefulWidget {
+final supabase = Supabase.instance.client;
+List ids = [];
+List asnwers = [];
+List links = [];
+
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<MainApp> createState() => _MainAppState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MainAppState extends State<MainApp> {
   Uint8List? _selectedImage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Math Questions'),
-      ),
-      body: MathQuestionsGrid(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddQuestionDialog(context);
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-
-  void _showAddQuestionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, setState) {
-            return Container(
-              height: 300,
-              child: AlertDialog(
-                title: Text('Add a New Question'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _selectedImage != null
-                        ? Image.memory(_selectedImage!)
-                        : TextButton(
-                            onPressed: () async {
-                              await _getImage();
-                              setState(() {});
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('Upload Image'),
-                                Icon(Icons.upload),
-                              ],
-                            ),
-                          ),
-                    // Add other question input fields here
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      // Upload image to Supabase
-                      if (_selectedImage != null) {
-                        _uploadImageToSupabaseBucket();
-                      }
-
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Upload Question'),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   Future<void> _getImage() async {
     _selectedImage = await ImagePickerWeb.getImageAsBytes();
   }
@@ -136,11 +69,90 @@ class _HomePageState extends State<HomePage> {
         .from('questions')
         .insert({"id": listOfPhotos.length - 1, "link": publicUrl, "answers": []});
   }
-}
-
-class MathQuestionsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return MaterialApp(
+      home: Scaffold(
+        floatingActionButton: TextButton(
+          child: Text("יש לי שאלה"),
+          onPressed: () {
+            showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return Container(
+              height: 300,
+              child: AlertDialog(
+                title: Text('שאל שאלה חדשה'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _selectedImage != null
+                        ? Image.memory(_selectedImage!)
+                        : TextButton(
+                            onPressed: () async {
+                              await _getImage();
+                              setState(() {});
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Upload Image'),
+                                Icon(Icons.upload),
+                              ],
+                            ),
+                          ),
+                    // Add other question input fields here
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('בטל'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      // Upload image to Supabase
+                      if (_selectedImage != null) {
+                        _uploadImageToSupabaseBucket();
+                      }
+
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('תוסיף את השאלה ללוח השאלות'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+          },
+        ),
+        body: MasonryGridView.builder(
+            itemCount: ids.length,
+            gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2),
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: GestureDetector(
+                  child: Image.network(links[index]),
+                  onTap: () {
+                    print(ids[index]);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => chat(id: ids[index])));
+                  },
+                ),
+              );
+            }),
+      ),
+    );
   }
 }
