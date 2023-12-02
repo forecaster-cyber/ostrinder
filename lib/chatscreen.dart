@@ -24,7 +24,7 @@ class _chatState extends State<chat> {
           TextButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => answers(answers_for_question: asnwers[ids.indexOf(widget.id)],)));
+                    MaterialPageRoute(builder: (context) => answers(answers_for_question: asnwers[ids.indexOf(widget.id)], id: widget.id,)));
               },
               child: Text("תשובות"))
         ],
