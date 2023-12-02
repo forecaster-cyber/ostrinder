@@ -1,17 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:ostrinder/pages/chat.dart';
+import 'dart:typed_data';
 
-List images = [
-  'https://i.insider.com/5a4bdbd41cbadd4b008b456b?width=1000&format=jpeg&auto=webp',
-  'https://i.insider.com/5a4bdbd41cbadd4b008b456b?width=1000&format=jpeg&auto=webp',
-  'https://i.insider.com/5a4bdbd41cbadd4b008b456b?width=1000&format=jpeg&auto=webp',
-  'https://i.insider.com/5a4bdbd41cbadd4b008b456b?width=1000&format=jpeg&auto=webp',
-  'https://i.insider.com/5a4bdbd41cbadd4b008b456b?width=1000&format=jpeg&auto=webp',
-  'https://i.insider.com/5a4bdbd41cbadd4b008b456b?width=1000&format=jpeg&auto=webp',
-  'https://i.insider.com/5a4bdbd41cbadd4b008b456b?width=1000&format=jpeg&auto=webp',
-];
+import 'package:flutter/material.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 void main() {
+  Supabase.initialize(
+    url: 'https://qnwzkrvbedkphyylkrgb.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFud3prcnZiZWRrcGh5eWxrcmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0MzYxNjQsImV4cCI6MjAxNzAxMjE2NH0.jtiObMhtY0dRqRLZCFkxs87vPUlF0MAUoBN-dw20A_o',
+  );
   runApp(MyApp());
 }
 
@@ -34,6 +32,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Uint8List? _selectedImage;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,72 +54,93 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add a New Question'),
-          content: TextField(
-            decoration: InputDecoration(labelText: 'Enter your question'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                // Handle the logic to add the question
-                Navigator.of(context).pop();
-              },
-              child: Text('Add'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return Container(
+              height: 300,
+              child: AlertDialog(
+                title: Text('Add a New Question'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _selectedImage != null
+                        ? Image.memory(_selectedImage!)
+                        : TextButton(
+                            onPressed: () async {
+                              await _getImage();
+                              setState(() {});
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Upload Image'),
+                                Icon(Icons.upload),
+                              ],
+                            ),
+                          ),
+                    // Add other question input fields here
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      // Upload image to Supabase
+                      if (_selectedImage != null) {
+                        _uploadImageToSupabaseBucket();
+                      }
+
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Upload Question'),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
+  }
+
+  Future<void> _getImage() async {
+    _selectedImage = await ImagePickerWeb.getImageAsBytes();
+  }
+
+  Future<void> _uploadImageToSupabaseBucket() async {
+    final List listOfPhotos =
+        await Supabase.instance.client.storage.from("questions").list();
+
+    print(listOfPhotos);
+//questions
+    await Supabase.instance.client.storage.from('questions').uploadBinary(
+        listOfPhotos.length.toString() + ".png", _selectedImage!,
+        fileOptions: const FileOptions(cacheControl: '3600', upsert: false));
+
+    await _uploadImageToSupabaseTable();
+  }
+
+  Future<void> _uploadImageToSupabaseTable() async {
+    final List listOfPhotos =
+        await Supabase.instance.client.storage.from("questions").list();
+    final String publicUrl = Supabase.instance.client.storage
+        .from('questions')
+        .getPublicUrl((listOfPhotos.length - 1).toString() + ".png");
+    print(listOfPhotos);
+    await Supabase.instance.client
+        .from('questions')
+        .insert({"id": listOfPhotos.length - 1, "link": publicUrl, "answers": []});
   }
 }
 
 class MathQuestionsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: MasonryGridView.builder(
-        gridDelegate:
-            SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-        itemCount: images.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ChatScreen()),
-                );
-              },
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.network(images[index])),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class MathQuestionCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Center(
-        child: Text(
-          'Math Question',
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
-    );
+    return Container();
   }
 }
