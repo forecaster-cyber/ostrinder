@@ -61,8 +61,8 @@ class _answersState extends State<answers> {
             if (supabase.auth.currentUser == null) {
               Navigator.pushNamed(context, '/sign', arguments: "home")
                   .then((value) => setState(() {}));
-            } else if (supabase.auth.currentUser?.email == "efisgang@gmail.com"){
-              print(supabase.auth.currentUser?.email == "efisgang@gmail.com");
+            } else if (supabase.auth.currentUser?.email == "efigang@gmail.com"){
+              print(supabase.auth.currentUser?.email == "efigang@gmail.com");
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
