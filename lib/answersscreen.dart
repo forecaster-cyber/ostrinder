@@ -52,68 +52,74 @@ class _answersState extends State<answers> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(title: Text("לוח תשובות"),),
+        appBar: AppBar(
+          title: Text("לוח תשובות"),
+        ),
         floatingActionButton: ElevatedButton(
           style: ElevatedButton.styleFrom(fixedSize: Size(200, 50)),
           onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(
-                  builder: (BuildContext context, setState) {
-                    return Container(
-                      height: 300,
-                      child: AlertDialog(
-                        title: Text("מוזמנים להציע פתרון"),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _selectedImage != null
-                                ? Image.memory(_selectedImage!)
-                                : TextButton(
-                                    onPressed: () async {
-                                      await _getImage();
-                                      setState(() {});
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text('Upload Image'),
-                                        Icon(Icons.upload),
-                                      ],
+            if (supabase.auth.currentUser == null) {
+              Navigator.pushNamed(context, '/sign', arguments: "home")
+                  .then((value) => setState(() {}));
+            } else {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return StatefulBuilder(
+                    builder: (BuildContext context, setState) {
+                      return Container(
+                        height: 300,
+                        child: AlertDialog(
+                          title: Text("מוזמנים להציע פתרון"),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _selectedImage != null
+                                  ? Image.memory(_selectedImage!)
+                                  : TextButton(
+                                      onPressed: () async {
+                                        await _getImage();
+                                        setState(() {});
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text('Upload Image'),
+                                          Icon(Icons.upload),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                            // Add other question input fields here
+                              // Add other question input fields here
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('בטל'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                // Upload image to Supabase
+                                if (_selectedImage != null) {
+                                  _uploadImageToSupabaseBucket();
+                                }
+
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("תוסיף את הפתרון לרשימת הפתרונות"),
+                            ),
                           ],
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('בטל'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              // Upload image to Supabase
-                              if (_selectedImage != null) {
-                                _uploadImageToSupabaseBucket();
-                              }
-
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("תוסיף את הפתרון לרשימת הפתרונות"),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-            );
+                      );
+                    },
+                  );
+                },
+              );
+            }
           },
-          
           child: Text("יש לי פתרון"),
         ),
         body: ListView.builder(
