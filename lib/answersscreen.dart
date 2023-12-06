@@ -50,8 +50,11 @@ class _answersState extends State<answers> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        floatingActionButton: TextButton(
+        appBar: AppBar(title: Text("לוח תשובות"),),
+        floatingActionButton: ElevatedButton(
+          style: ElevatedButton.styleFrom(fixedSize: Size(200, 50)),
           onPressed: () {
             showDialog(
               context: context,
@@ -110,6 +113,7 @@ class _answersState extends State<answers> {
               },
             );
           },
+          
           child: Text("יש לי פתרון"),
         ),
         body: ListView.builder(

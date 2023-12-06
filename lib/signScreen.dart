@@ -48,7 +48,7 @@ class _SignScreenState extends State<SignScreen> {
                       .then((value) => setState(() {}));
                 } else if (widget.redirectTo == "home") {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/')
+                  Navigator.pushNamed(context, '/main')
                       .then((value) => setState(() {}));
                 }
               });

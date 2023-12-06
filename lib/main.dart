@@ -7,6 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'dart:typed_data';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:just_audio/just_audio.dart';
+import 'welcome.dart';
 late dynamic data;
 Future<void> main() async {
   await Supabase.initialize(
@@ -14,11 +16,12 @@ Future<void> main() async {
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFud3prcnZiZWRrcGh5eWxrcmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0MzYxNjQsImV4cCI6MjAxNzAxMjE2NH0.jtiObMhtY0dRqRLZCFkxs87vPUlF0MAUoBN-dw20A_o',
   );
-
+  
+   
   data = await supabase.from('questions').select('*');
   runApp(MaterialApp(
     routes: {
-      '/': (context) => MainApp(),
+      '/': (context) => welcome(),
       '/sign': (context) {
         // You need to handle the parameters appropriately
         String redirectTo =
@@ -26,6 +29,7 @@ Future<void> main() async {
         return SignScreen(redirectTo: redirectTo);
       },
       '/profile': (context) => ProfilePage(),
+      '/main' :(context) => MainApp()
     },
     debugShowCheckedModeBanner: false,
   ));
@@ -39,6 +43,7 @@ Future<void> main() async {
   print(ids);
   print(asnwers);
   print(links);
+  
 }
 
 final supabase = Supabase.instance.client;
@@ -83,7 +88,7 @@ class _MainAppState extends State<MainApp> {
       "id": listOfPhotos.length - 1,
       "link": publicUrl,
       "answers": [],
-      "create_by": supabase.auth.currentUser!.email!
+      "created_by": supabase.auth.currentUser!.email!
     });
   }
 
@@ -205,8 +210,9 @@ class _MainAppState extends State<MainApp> {
                       links[index],
                       fit: BoxFit.cover,
                     )),
-                onTap: () {
+                onTap: () async{
                   print(ids[index]);
+                  
                   Navigator.push(
                       context,
                       MaterialPageRoute(
