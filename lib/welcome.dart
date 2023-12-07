@@ -13,7 +13,7 @@ class _welcomeState extends State<welcome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("אתר שיעורי הבית של אפי והחברים")),
+      appBar: AppBar(title: Text("!ברוכים הבאים לאתר כפר עזרה")),
       body: Center(
         child: ElevatedButton(
             onPressed: () async {
@@ -26,7 +26,7 @@ class _welcomeState extends State<welcome> {
               player.play();
               
             },
-            child: Text("כנס לעולם שיעורי הבית"),
+            child: Text("!כנסו לכפר עזרה"),
             style: ElevatedButton.styleFrom(fixedSize: Size(200, 50))),
       ),
     );
