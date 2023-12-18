@@ -7,8 +7,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'dart:typed_data';
 import 'package:image_picker_web/image_picker_web.dart';
-import 'package:just_audio/just_audio.dart';
+import 'home_screen.dart';
 import 'welcome.dart';
+
 late dynamic data;
 Future<void> main() async {
   await Supabase.initialize(
@@ -16,12 +17,13 @@ Future<void> main() async {
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFud3prcnZiZWRrcGh5eWxrcmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0MzYxNjQsImV4cCI6MjAxNzAxMjE2NH0.jtiObMhtY0dRqRLZCFkxs87vPUlF0MAUoBN-dw20A_o',
   );
-  
-   
+
   data = await supabase.from('questions').select('*');
   runApp(MaterialApp(
+    theme: ThemeData(useMaterial3: false),
     routes: {
-      '/': (context) => welcome(),
+      // '/': (context) => welcome(),
+      '/': (context) => HomeScreen(),
       '/sign': (context) {
         // You need to handle the parameters appropriately
         String redirectTo =
@@ -29,7 +31,7 @@ Future<void> main() async {
         return SignScreen(redirectTo: redirectTo);
       },
       '/profile': (context) => ProfilePage(),
-      '/main' :(context) => MainApp()
+      '/main': (context) => QuestionsBoard()
     },
     debugShowCheckedModeBanner: false,
   ));
@@ -43,7 +45,6 @@ Future<void> main() async {
   print(ids);
   print(asnwers);
   print(links);
-  
 }
 
 final supabase = Supabase.instance.client;
@@ -51,14 +52,14 @@ List ids = [];
 List asnwers = [];
 List links = [];
 
-class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+class QuestionsBoard extends StatefulWidget {
+  const QuestionsBoard({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
+  State<QuestionsBoard> createState() => _QuestionsBoardState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _QuestionsBoardState extends State<QuestionsBoard> {
   Uint8List? _selectedImage;
   Future<void> _getImage() async {
     _selectedImage = await ImagePickerWeb.getImageAsBytes();
@@ -94,7 +95,6 @@ class _MainAppState extends State<MainApp> {
 
   @override
   void initState() {
-    
     print('susss');
     super.initState();
   }
@@ -102,29 +102,6 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text('לוח שאלות'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                if (supabase.auth.currentUser == null) {
-                  Navigator.pushNamed(context, '/sign', arguments: "profile")
-                      .then((value) => setState(() {}));
-                } else {
-                  Navigator.pushNamed(context, '/profile')
-                      .then((value) => setState(() {}));
-                }
-              },
-              icon: supabase.auth.currentSession == null
-                  ? CircleAvatar(
-                      child: Icon(Icons.person),
-                      backgroundColor: Colors.white,
-                      radius: 100,
-                    )
-                  : BoringAvatars(name: supabase.auth.currentUser!.email!))
-        ],
-      ),
       floatingActionButton: ElevatedButton(
         style: ElevatedButton.styleFrom(fixedSize: Size(200, 50)),
         child: Text("יש לי שאלה"),
@@ -211,9 +188,9 @@ class _MainAppState extends State<MainApp> {
                       links[index],
                       fit: BoxFit.cover,
                     )),
-                onTap: () async{
+                onTap: () async {
                   print(ids[index]);
-                  
+
                   Navigator.push(
                       context,
                       MaterialPageRoute(

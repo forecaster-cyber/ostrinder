@@ -18,13 +18,12 @@ class _welcomeState extends State<welcome> {
         child: ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => MainApp()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => QuestionsBoard()));
               AudioPlayer player = AudioPlayer();
               await player.setAsset('assets/audios/song2.mp3');
               await player.setLoopMode(LoopMode.one);
               player.play();
-              
             },
             child: Text("!כנסו לכפר עזרה"),
             style: ElevatedButton.styleFrom(fixedSize: Size(200, 50))),
