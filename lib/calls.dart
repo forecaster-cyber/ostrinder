@@ -58,6 +58,11 @@ class _calls_screenState extends State<calls_screen> {
                       onPressed: () {
                         if (datatatata![index]['open']) {
                           launchUrl(Uri.parse(datatatata![index]['link']));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("החדר לא פתוח"),
+                            duration: Duration(milliseconds: 300),
+                          ));
                         }
                       },
                       child: Text(datatatata![index]['open'] ? "פתוח" : "סגור"),
