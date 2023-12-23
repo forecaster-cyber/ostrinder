@@ -4,6 +4,7 @@ import 'chatscreen.dart';
 import 'dart:typed_data';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class answers extends StatefulWidget {
   const answers(
@@ -61,7 +62,8 @@ class _answersState extends State<answers> {
             if (supabase.auth.currentUser == null) {
               Navigator.pushNamed(context, '/sign', arguments: "home")
                   .then((value) => setState(() {}));
-            } else if (supabase.auth.currentUser?.email == "efigang@gmail.com"){
+            } else if (supabase.auth.currentUser?.email ==
+                "efigang@gmail.com") {
               print(supabase.auth.currentUser?.email == "efigang@gmail.com");
               showDialog(
                 context: context,
@@ -125,7 +127,12 @@ class _answersState extends State<answers> {
         ),
         body: ListView.builder(
           itemBuilder: (context, index) {
-            return Image.network(widget.answers_for_question[index]);
+            return GestureDetector(
+              child: Image.network(widget.answers_for_question[index]),
+              onTap: () {
+                launchUrl(Uri.parse(widget.answers_for_question[index]));
+              },
+            );
           },
           itemCount: widget.answers_for_question.length,
         ),
