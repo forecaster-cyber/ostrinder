@@ -17,6 +17,7 @@ dependencies:
   flutter_boring_avatars: ^1.0.1
   just_audio: ^0.9.36
   url_launcher: ^6.2.2
+  flutter_svg: ^2.0.9
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +29,11 @@ flutter:
   assets:
     - assets/audios/song2.mp3
     - assets/images/call_icon.png
+    - assets/images/bruh.svg
+    # - assets/COMIC.ttf
+
+
+  fonts:
+    - family: COMIC
+      fonts:
+        - asset: assets/COMIC.ttf

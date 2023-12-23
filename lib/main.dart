@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_boring_avatars/flutter_boring_avatars.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:ostrinder/chatscreen.dart';
 import 'package:ostrinder/profilePage.dart';
 import 'package:ostrinder/signScreen.dart';
@@ -102,103 +105,140 @@ class _QuestionsBoardState extends State<QuestionsBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: ElevatedButton(
-        style: ElevatedButton.styleFrom(fixedSize: Size(200, 50)),
-        child: Text("יש לי שאלה"),
-        onPressed: () {
-          if (supabase.auth.currentUser == null) {
-            Navigator.pushNamed(context, '/sign', arguments: "home")
-                .then((value) => setState(() {}));
-          } else {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(
-                  builder: (BuildContext context, setState) {
-                    return Container(
-                      height: 300,
-                      child: AlertDialog(
-                        title: Text('שאל שאלה חדשה'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _selectedImage != null
-                                ? Image.memory(_selectedImage!)
-                                : TextButton(
-                                    onPressed: () async {
-                                      await _getImage();
-                                      setState(() {});
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text('Upload Image'),
-                                        Icon(Icons.upload),
-                                      ],
-                                    ),
-                                  ),
-                            // Add other question input fields here
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('בטל'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              // Upload image to Supabase
-                              if (_selectedImage != null) {
-                                _uploadImageToSupabaseBucket();
-                              }
-
-                              Navigator.of(context).pop();
-                              setState(() {});
-                            },
-                            child: Text('תוסיף את השאלה ללוח השאלות'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
+      backgroundColor: Colors.transparent,
+      floatingActionButton: Container(
+        width: 175,
+        height: 50,
+        child: ClipRRect(
+          
+          child: GestureDetector(
+              onTap: () {
+                if (supabase.auth.currentUser == null) {
+                  Navigator.pushNamed(context, '/sign', arguments: "home")
+                      .then((value) => setState(() {}));
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return StatefulBuilder(
+                        builder: (BuildContext context, setState) {
+                          return Container(
+                            height: 300,
+                            child: AlertDialog(
+                              title: Text('שאל שאלה חדשה'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _selectedImage != null
+                                      ? Image.memory(_selectedImage!)
+                                      : TextButton(
+                                          onPressed: () async {
+                                            await _getImage();
+                                            setState(() {});
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text('Upload Image'),
+                                              Icon(Icons.upload),
+                                            ],
+                                          ),
+                                        ),
+                                  // Add other question input fields here
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('בטל'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    // Upload image to Supabase
+                                    if (_selectedImage != null) {
+                                      _uploadImageToSupabaseBucket();
+                                    }
+        
+                                    Navigator.of(context).pop();
+                                    setState(() {});
+                                  },
+                                  child: Text('תוסיף את השאלה ללוח השאלות'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
               },
-            );
-          }
-        },
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.4),
+                        Colors.white.withOpacity(0.4),
+                      ],
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                    border: Border.all(
+                      width: 1.5,
+                      color: Colors.white.withOpacity(0.6),
+                    ),
+                  ),
+                  child: Center(child: Text("יש לי שאלה", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18, fontFamily: 'COMIC'),)),
+                ),
+              )),
+        ),
       ),
-      body: MasonryGridView.builder(
-          itemCount: ids.length,
-          gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-              // tried to make grid more responsive
-              crossAxisCount:
-                  (MediaQuery.of(context).size.width ~/ 200).toInt() < 5
-                      ? (MediaQuery.of(context).size.width ~/ 200).toInt()
-                      : 5),
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: GestureDetector(
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      links[index],
-                      fit: BoxFit.cover,
-                    )),
-                onTap: () async {
-                  print(ids[index]);
+      body: Stack(
+        children: [
+          SvgPicture.asset(
+            'assets/images/bruh.svg',
+            alignment: Alignment.center,
+            fit: BoxFit.cover,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+          ),
+          MasonryGridView.builder(
+              itemCount: ids.length,
+              gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                  // tried to make grid more responsive
+                  crossAxisCount:
+                      (MediaQuery.of(context).size.width ~/ 200).toInt() < 5
+                          ? (MediaQuery.of(context).size.width ~/ 200).toInt()
+                          : 5),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: GestureDetector(
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          links[index],
+                          fit: BoxFit.cover,
+                        )),
+                    onTap: () async {
+                      print(ids[index]);
 
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => chat(id: ids[index])));
-                },
-              ),
-            );
-          }),
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => chat(id: ids[index])));
+                    },
+                  ),
+                );
+              }),
+        ],
+      ),
     );
   }
 }
