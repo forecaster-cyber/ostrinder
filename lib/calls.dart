@@ -66,7 +66,7 @@ class _calls_screenState extends State<calls_screen> {
                               ),
                               child: Column(
                                 children: [
-                                  Text((index + 1).toString()),
+                                  Text((index + 1).toString(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 50.0),),
                                   GestureDetector(
                                     child: Image(
                                         image: AssetImage(
