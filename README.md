@@ -1,3 +1,3 @@
 # ostrinder
 
-A new Flutter project.
+made by Dan Arfi & Serge Brainin
