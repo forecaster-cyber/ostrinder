@@ -42,7 +42,7 @@ class _calls_screenState extends State<calls_screen> {
               List<Map<String, dynamic>>? datatatata = snapshot.data;
               return GridView.count(
                 crossAxisCount: isWebMobile ? 1 : 3,
-                children: List.generate(12, (index) {
+                children: List.generate(datatatata!.length, (index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Padding(
@@ -75,7 +75,7 @@ class _calls_screenState extends State<calls_screen> {
                                     datatatata![index]['name'].toString(),
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 50.0),
+                                        fontSize: isWebMobile ? 25.0 : 50.0),
                                   ),
                                   GestureDetector(
                                     child: Image(
@@ -98,6 +98,7 @@ class _calls_screenState extends State<calls_screen> {
                                       } else {
                                         print("unauthorized");
                                         print(kIsWeb);
+                                        print(datatatata);
                                       }
                                     },
                                   ),

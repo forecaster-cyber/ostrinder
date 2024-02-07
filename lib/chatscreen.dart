@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:ostrinder/answersscreen.dart';
 import 'main.dart';
@@ -15,6 +17,44 @@ class _chatState extends State<chat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Container(
+          width: 175,
+          height: 50,
+          child: ClipRRect(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => answers(
+                              answers_for_question:
+                                  asnwers[ids.indexOf(widget.id)],
+                              id: widget.id,
+                            )));
+              },
+              child: BackdropFilter( filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.4),
+                        Colors.white.withOpacity(0.4),
+                      ],
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                    border: Border.all(
+                      width: 1.5,
+                      color: Colors.white.withOpacity(0.6),
+                    ),
+                  ),
+                  child: Center(child: Text("תשובות", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18, fontFamily: 'COMIC'),)),
+                ),
+              ),
+            ),
+            
+          )),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -29,18 +69,6 @@ class _chatState extends State<chat> {
                 launchUrl(Uri.parse(links[ids.indexOf(widget.id)]));
               },
             ),
-            TextButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => answers(
-                                answers_for_question:
-                                    asnwers[ids.indexOf(widget.id)],
-                                id: widget.id,
-                              )));
-                },
-                child: Text("תשובות"))
           ],
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
