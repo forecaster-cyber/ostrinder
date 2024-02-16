@@ -31,13 +31,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text("כפר עזרה"),
                 actions: [
                   Padding(
-                    padding:  EdgeInsets.only(right: ((MediaQuery.of(context).size.width)/2)-250, left: 0.0),
-                    child: TextButton(
+                    padding: isWebMobile ? EdgeInsets.all(0.0): EdgeInsets.only(right: ((MediaQuery.of(context).size.width)/2)-250, left: 0.0),
+                    child:  isWebMobile  ? IconButton(onPressed: () {
+                          launchUrl(Uri.parse(
+                              "https://docs.google.com/spreadsheets/d/199ajAA3xPpAQeUbqYiaRYCVYL0jM3TWnfaTf8uafamM/edit?usp=sharing"));
+                        }, icon: Icon(Icons.account_box_rounded)) : TextButton(
                         onPressed: () {
                           launchUrl(Uri.parse(
                               "https://docs.google.com/spreadsheets/d/199ajAA3xPpAQeUbqYiaRYCVYL0jM3TWnfaTf8uafamM/edit?usp=sharing"));
                         },
-                        child: Text("לחצו כאן לזמינות המתנדבים", style: TextStyle(fontSize: isWebMobile ? 10 : 32, color: Colors.white, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),)),
+                        child: Text("לחצו כאן לזמינות המתנדבים", style: TextStyle(fontSize: 32, color: Colors.white, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),)),
                   ),
                   IconButton(
                       onPressed: () {
